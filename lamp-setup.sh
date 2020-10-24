@@ -6,6 +6,7 @@ APR_VER=1.7.0
 APR_ICONV_VER=1.2.2
 APR_UTIL_VER=1.6.1
 HTTPD_VER=2.4.46
+PHP_VER=7.4.11
 
 #############################################
 # apr
@@ -63,4 +64,20 @@ if test ! -f /opt/lamp/bin/httpd; then
 	popd
 fi
 
+#############################################
+# php
+#############################################
+
+if test ! -f /opt/lamp/modules/libphp7.so; then
+	test ! -d /tmp/php-$PHP_VER && tar -xvf php-$PHP_VER.tar.bz2 -C /tmp
+
+	pushd /tmp/php-$PHP_VER
+	test ! -f Makefile && EXTENSION_DIR=/opt/lamp/lib/extensions ./configure CFLAGS=-O2 CXXFLAGS=-O2 --prefix=/opt/lamp --with-config-file-path=/opt/lamp/etc --with-config-file-scan-dir=/opt/lamp/etc/php.d --with-apxs2=/opt/lamp/bin/apxs --enable-inline-optimization --enable-maintainer-zts --with-tsrm-pthreads --enable-phpdbg --with-openssl --with-kerberos --with-system-ciphers --with-zlib --enable-bcmath --with-bz2 --enable-calendar --with-curl --enable-dba=shared --with-enchant --enable-exif --with-ffi --enable-ftp --enable-gd --with-external-gd --with-webp --with-jpeg --with-xpm --with-freetype --enable-gd-jis-conv --with-gettext --with-gmp --with-mhash --with-imap --with-kerberos --with-imap-ssl --enable-intl --with-ldap --with-ldap-sasl --enable-mbstring --with-mysqli --enable-pcntl --with-pdo-mysql --with-pspell --with-libedit --with-readline --enable-shmop --with-snmp --enable-soap --enable-sockets --enable-sysvmsg --enable-sysvsem --enable-sysvshm --with-tidy --with-expat --with-xmlrpc --with-xsl --enable-zend-test=shared --with-zip --enable-mysqlnd
+	make -j4
+	make install
+	test ! -d /opt/lamp/etc && mkdir /opt/lamp/etc
+	\cp php.ini-* /opt/lamp/etc/
+	test ! -f /opt/lamp/etc/php.ini && \cp php.ini-development /opt/lamp/etc/php.ini
+	popd
+fi
 
