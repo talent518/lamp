@@ -7,6 +7,7 @@ APR_ICONV_VER=1.2.2
 APR_UTIL_VER=1.6.1
 HTTPD_VER=2.4.46
 PHP_VER=7.4.11
+MY_VER=10.5.6
 
 #############################################
 # apr
@@ -78,6 +79,23 @@ if test ! -f /opt/lamp/modules/libphp7.so; then
 	test ! -d /opt/lamp/etc && mkdir /opt/lamp/etc
 	\cp php.ini-* /opt/lamp/etc/
 	test ! -f /opt/lamp/etc/php.ini && \cp php.ini-development /opt/lamp/etc/php.ini
+	popd
+fi
+
+#############################################
+# mariadb
+#############################################
+
+if test ! -f /opt/lamp/bin/mysqld; then
+	test ! -d /tmp/mariadb-$MY_VER && tar -xvf mariadb-$MY_VER.tar.gz -C /tmp
+
+	pushd /tmp/mariadb-$MY_VER
+	test ! -d build && mkdir build
+	pushd build
+	test ! -f Makefile && cmake .. -DCMAKE_INSTALL_PREFIX=/opt/lamp -DMYSQL_DATADIR=/opt/lamp/var/mysql -DSYSCONFDIR=/opt/lamp/etc -DWITHOUT_TOKUDB=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STPRAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWIYH_READLINE=1 -DWIYH_SSL=system -DVITH_ZLIB=system -DWITH_LOBWRAP=0 -DMYSQL_UNIX_ADDR=/opt/lamp/var/mysql/mysql.sock -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
+	make -j4
+	make install
+	popd
 	popd
 fi
 
